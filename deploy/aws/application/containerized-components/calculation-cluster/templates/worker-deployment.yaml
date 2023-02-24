@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: {{ .Release.Name }}
+  name: worker
+  labels:
+    app.kubernetes.io/name: worker
+    app.kubernetes.io/instance: worker
+spec:
+  replicas: {{ .Values.worker.replica_count }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: worker
+      app.kubernetes.io/instance: worker
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: worker
+        app.kubernetes.io/instance: worker
+    spec:
+      containers:
+        - name: worker-container
+          command:
+            - /bin/bash
+            - -c 
+            - /home/edit_config.sh "$AkkaHostName" "$AkkaHostName" && cd /opt/calcEngine && ./CalculationEngineService -debug -port {{ .Values.worker.engine_port }}  -router "router.{{ .Release.Name }}.svc.cluster.local:{{ .Values.router.engine_port }}"
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.worker.engine_port }}
+          env:
+           - name: AkkaHostName
+             valueFrom:
+               fieldRef:
+                 fieldPath: status.podIP
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      nodeSelector:
+        kubernetes.io/os: linux

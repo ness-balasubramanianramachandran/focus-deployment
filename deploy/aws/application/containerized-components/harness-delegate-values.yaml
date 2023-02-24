@@ -1,0 +1,40 @@
+# This harness-delegate-values.yaml file is compatible with version 1.0.2
+# of the harness-delegate helm chart.
+
+# You can download the harness-delegate helm chart at
+# https://app.harness.io/storage/harness-download/harness-helm-charts/
+
+# To add Harness helm repo with name harness:
+# helm repo add harness https://app.harness.io/storage/harness-download/harness-helm-charts/
+
+# To install the chart with the release name my-release and this values.yaml
+# helm install --name my-release harness/harness-delegate -f harness-delegate-values.yaml
+
+# Account Id to which the delegate will be connecting
+accountId: CW24KX4MQZG_VbH8D-TBPA
+
+# Secret identifier associated with the account
+delegateToken: 26608f857377c69df04ef2f085fe894a
+
+# Short 6 character identifier of the account
+accountIdShort: cwkxmq
+
+delegateName: eks-harness-delegate
+
+# Id of the delegate profile that needs to run when the delegate is
+# coming up
+delegateProfile: "t3fy-HLJReWa4eCbLWl4Gw"
+
+delegateType: "HELM_DELEGATE"
+
+delegateDockerImage: harness/delegate:latest
+
+managerHostAndPort: https://app.harness.io/gratis
+watcherStorageUrl: https://app.harness.io/public/free/freemium/watchers
+watcherCheckLocation: current.version
+delegateStorageUrl: https://app.harness.io
+delegateCheckLocation: delegatefree.txt
+useCdn: true
+jreVersion: 1.8.0_242
+cdnUrl: https://app.harness.io
+remoteWatcherUrlCdn: https://app.harness.io/public/shared/watchers/builds

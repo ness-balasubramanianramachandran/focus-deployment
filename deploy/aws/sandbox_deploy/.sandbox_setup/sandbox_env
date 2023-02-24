@@ -1,0 +1,8 @@
+# Public IP address or DNS name of the linux bastion host (ansible controle node):
+LINUX_BASTION_HOST='ec2-54-162-109-239.compute-1.amazonaws.com'
+# Private key of the linux bastion, absolute file path on your laptop: 
+PRIVATE_KEY_PATH='C:\Users\e5658831\.bastion\sb_win_super_bastion_rsa'
+# Absolute directory path on the bastion where the ansible playbook will be copied to: 
+ANSIBLE_DIR="~/projects/ansible"
+
+export LINUX_BASTION_HOST PRIVATE_KEY_PATH ANSIBLE_DIR

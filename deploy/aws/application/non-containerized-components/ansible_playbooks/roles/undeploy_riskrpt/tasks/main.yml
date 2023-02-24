@@ -1,0 +1,47 @@
+- name: Find SQL Admin Risk Reporting msi
+  win_find:
+    paths: "{{ software_dir }}\\bsmi_{{ app_version }}\\Installers"
+    patterns: "FIS Risk Reporting - SQL Administration.msi" 
+  register: sqlriskrpt_msi
+
+- name: Install Risk SQL Admin
+  win_package:
+    arguments: "INSTALLFOLDER=\"{{ sqlriskrpt_install_dir }}\""
+    state: absent
+    path: "{{ sqlriskrpt_msi.files[0].path }}"
+
+- name: Find Excel Edition Risk msi
+  win_find:
+    paths: "{{ software_dir }}\\bsmi_{{ app_version }}\\Installers"
+    patterns: "FIS Risk Reporting - Excel Edition.msi" 
+  register: excelriskrpt_msi
+
+- name: Install Risk Excel edition
+  win_package:
+    arguments: "INSTALLFOLDER=\"{{ excelriskrpt_install_dir }}\""
+    state: absent
+    path: "{{ excelriskrpt_msi.files[0].path }}"
+
+- name: Find Web Edition Risk msi
+  win_find:
+    paths: "{{ software_dir }}\\bsmi_{{ app_version }}\\Installers"
+    patterns: "FIS Risk Reporting - Web Edition.msi" 
+  register: webriskrpt_msi
+
+- name: Install Risk web edition
+  win_package:
+    arguments: "INSTALLFOLDER=\"{{ webriskrpt_install_dir }}\""
+    state: absent
+    path: "{{ webriskrpt_msi.files[0].path }}"
+
+- name: Find IIS Risk Reporting msi
+  win_find:
+    paths: "{{ software_dir }}\\bsmi_{{ app_version }}\\Installers"
+    patterns: "IISSetup.msi" 
+  register: iisriskrpt_msi
+
+- name: Install Risk IIS Bootstrap
+  win_package:
+    arguments: "INSTALLFOLDER=\"{{ iisriskrpt_install_dir }}\""
+    state: absent
+    path: "{{ iisriskrpt_msi.files[0].path }}"

@@ -1,0 +1,5 @@
+---
+#encrypt vault file with: ansible-vault encrypt vault
+#later edit the encrypted file with: ansible-vault edit vault
+vault_example_grp_pass: s3cr3t
+...

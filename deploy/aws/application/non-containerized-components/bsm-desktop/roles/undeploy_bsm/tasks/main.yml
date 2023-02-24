@@ -1,0 +1,85 @@
+- name: Find Focus msi 
+  win_find:
+    paths: "{{ software_dir }}\\bsm_{{ app_version }}\\Installers" 
+    patterns: FIS.BalanceSheetManager Internal-*-win64.msi
+  register: focus_msi
+
+- name: Find DataHub msi
+  win_find:
+    paths: "{{ software_dir }}\\bsm_{{ app_version }}\\Installers"
+    patterns: Data Hub-*-win64.msi 
+  register: datahub_msi
+
+- name: Find Focus plugins
+  win_find:
+    paths: "{{ software_dir }}\\bsm_{{ app_version }}\\Installers"
+    patterns: FIS.BalanceSheetManager Instrument Plug-In-*.zip 
+  register: focus_plugins
+
+- name: Uninstall Focus
+  win_package:
+    product_id: ''
+    arguments: "INSTALLFOLDER=\"{{ bsm_install_dir }}\""
+    state: absent
+    path: "{{ focus_msi.files[0].path }}"
+
+- name: Close Windows Firewall ports for Focus
+  win_firewall_rule:
+    name: FocusAppServer-TCP-In
+    localport: "{{ bsm_port_range }}" 
+    action: allow
+    direction: in
+    protocol: tcp
+    state: absent
+    enabled: yes
+
+- name: Delete Focus installation directory
+  win_file:
+    path: "{{ bsm_install_dir }}" 
+    state: absent
+
+- name: Uninstall DataHub
+  win_package:
+    product_id: ''
+    arguments: "INSTALL_CONFIG=\"{{ dh_web_dir }}\\dh_config.json\" INSTALL_DIR=\"{{ dh_install_dir }}\" /quiet /L {{ dh_web_dir }}\\Logs\\out.txt"
+    state: absent
+    path: "{{ datahub_msi.files[0].path }}"
+  
+- name: Delete DataHub database
+  win_shell: "Invoke-Sqlcmd –ServerInstance {{ mssql_endpoint }} –Query \"USE master; ALTER DATABASE {{ dh_db_name }} SET SINGLE_USER WITH ROLLBACK IMMEDIATE; DROP DATABASE {{ dh_db_name }}\" –Username {{ mssql_username }} -Password {{ mssql_password }}"
+ 
+- name: Delete DataHub website dir
+  win_file:
+    path: "{{ dh_web_dir }}"
+    state: absent
+
+- name: Close Windows Firewall ports for DataHub
+  win_firewall_rule:
+    name: DataHubWebsite-TCP-In 
+    localport: "{{ dh_port_number }}" 
+    action: allow
+    direction: in
+    protocol: tcp
+    state: absent
+    enabled: yes
+  
+- name: Disable IIS (Web-Server only)
+  win_feature:
+    name: Web-Server
+    state: absent
+
+- name: Uninstall 3rd party sw packages
+  win_package:
+    state: absent
+    product_id: "{{ item.productid }}"
+    path: "{{ software_dir }}\\third_party_sw\\{{ item.file_name }}"
+    arguments: "{{ item.arguments }}"
+  loop: "{{ third_party_sw }}"
+
+- name: Delete software directory
+  win_file:
+    path: "{{ software_dir }}"
+    state: absent
+
+- name: Reboot the machine
+  win_reboot:

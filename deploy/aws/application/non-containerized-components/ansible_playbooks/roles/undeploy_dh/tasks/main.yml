@@ -1,0 +1,55 @@
+- name: Find DataHub msi
+  win_find:
+    paths: "{{ software_dir }}\\bsmi_{{ app_version }}\\Installers"
+    patterns: Data Hub-*-win64.msi
+  register: datahub_msi
+
+- name: Find Focus plugins
+  win_find:
+    paths: "{{ software_dir }}\\bsmi_{{ app_version }}\\Installers"
+    patterns: FIS.BalanceSheetManager Instrument Plug-In-*.zip
+  register: focus_plugins
+
+- name: Un-Install DataHub
+  win_package:
+    arguments: "INSTALL_CONFIG=\"{{ dh_web_dir }}\\dh_config.json\" INSTALL_DIR=\"{{ dh_install_dir }}\" /quiet /L {{ dh_web_dir }}\\Logs\\out.txt"
+    state: absent
+    path: "{{ datahub_msi.files[0].path }}"  
+
+- name: Remove sqlserver PowerShell module
+  win_psmodule:
+    name: sqlserver
+    state: absent
+
+#- name:  Delete DataHub database
+#  win_shell: 'Invoke-Sqlcmd –ServerInstance "{{ mssql_endpoint }},{{ mssql_port }}" –Query " DROP Database IF EXISTS {{ dh_db_name }}" –Username {{ mssql_username }} -Password {{ mssql_password }}'
+
+- name: Delete DataHub Logs dir
+  win_file:
+    path: "{{ dh_web_dir }}\\Logs"
+    state: absent
+
+- name: Delete DataHub plugins dir
+  win_file:
+    path: "{{ dh_web_dir }}\\Plugins"
+    state: absent
+
+- name: Delete DataHub license
+  win_file:
+    path: "{{ dh_web_dir }}\\license.xml"
+    state: absent    
+
+- name: Delete DataHub configuration template
+  win_file:
+    path: "{{ dh_web_dir }}\\dh_config.json"
+    state: absent
+
+- name: Close Windows Firewall ports for DataHub
+  win_firewall_rule:
+    name: DataHubWebsite-TCP-In
+    localport: "{{ dh_port_number }}"
+    action: allow
+    direction: in
+    protocol: tcp
+    state: absent
+    enabled: yes

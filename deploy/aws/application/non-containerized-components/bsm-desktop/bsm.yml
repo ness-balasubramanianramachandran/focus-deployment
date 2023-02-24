@@ -1,0 +1,5 @@
+---
+- hosts: bastion 
+  roles:
+    - { role: deploy_bsm, when:  action  == 'deploy' }
+    - { role: undeploy_bsm, when:  action  == 'undeploy' }

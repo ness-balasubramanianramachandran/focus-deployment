@@ -1,0 +1,28 @@
+---
+  - name: Delete software directory if it exists
+    win_file:
+      path: "{{ software_dir }}"
+      state: absent
+
+  - name: Create 3rd party software directory
+    win_file:
+      path: "{{ software_dir }}\\third_party_sw"
+      state: directory
+      
+  - name: Create SQL installers software directory
+    win_file:
+      path: "{{ software_dir }}\\mssql_server"
+      state: directory
+
+  - name: Download MSSQL server file from Artifactory
+    win_get_url:
+      url: "{{ af_generic_repo_url }}/sql-server/{{ mssql_software_name }}"
+      url_username: "{{ af_username }}"
+      url_password: "{{ af_password }}"
+      dest: "{{ software_dir }}\\mssql_server"
+      
+  - name: Save the configuration file for SQL Server
+    win_template:
+      src: SqlServer.ini.j2
+      dest: "{{ software_dir }}\\third_party_sw\\sql_conf.ini"
+

@@ -1,0 +1,68 @@
+- name: Find DataHub msi
+  win_find:
+    paths: "{{ software_dir }}\\bsmi_{{ app_version }}\\Installers"
+    patterns: Data Hub-*-win64.msi
+  register: datahub_msi
+
+- name: Find Focus plugins
+  win_find:
+    paths: "{{ software_dir }}\\bsmi_{{ app_version }}\\Installers"
+    patterns: FIS.BalanceSheetManager Instrument Plug-In-*.zip
+  register: focus_plugins
+
+- name: Add sqlserver PowerShell module
+  win_psmodule:
+    name: sqlserver
+    state: present
+
+# - name: Create an empty database for DataHub
+#   win_shell: 'Invoke-Sqlcmd –ServerInstance "{{ mssql_endpoint }},{{ mssql_port }}" –Query " DROP Database IF EXISTS {{ dh_db_name }};
+# CREATE DATABASE {{ dh_db_name }} COLLATE Latin1_General_CS_AS" –Username {{ mssql_username }} -Password {{ mssql_password }}'
+
+- name: Create DataHub Logs dir
+  win_file:
+    path: "{{ dh_web_dir }}\\Logs"
+    state: directory
+
+- name: Create DataHub plugins dir
+  win_file:
+    path: "{{ dh_web_dir }}\\Plugins"
+    state: directory
+
+- name: Copy DataHub license
+  win_copy:
+    src: dh_license.xml
+    dest: "{{ dh_web_dir }}\\license.xml"
+
+- name: Copy DataHub configuration template
+  win_template:
+    src: dh_config.j2
+    dest: "{{ dh_web_dir }}\\dh_config.json"
+
+- name: Copy plugins
+  win_copy:
+    src: "{{ focus_plugins.files[0].path }}"
+    dest: "{{ dh_web_dir }}\\Plugins\\{{ focus_plugins.files[0].filename }}"
+    remote_src: yes
+
+- name: Unzip plugins archive
+  win_unzip:
+    src: "{{ dh_web_dir }}\\Plugins\\{{ focus_plugins.files[0].filename }}"
+    dest: "{{ dh_web_dir }}\\Plugins\\Focus Instrument Plug-In"
+    delete_archive: yes
+
+- name: Install DataHub
+  win_package:
+    arguments: "INSTALL_CONFIG=\"{{ dh_web_dir }}\\dh_config.json\" INSTALL_DIR=\"{{ dh_install_dir }}\" /quiet /L {{ dh_web_dir }}\\Logs\\out.txt"
+    state: present
+    path: "{{ datahub_msi.files[0].path }}"
+
+- name: Open Windows Firewall ports for DataHub
+  win_firewall_rule:
+    name: DataHubWebsite-TCP-In
+    localport: "{{ dh_port_number }}"
+    action: allow
+    direction: in
+    protocol: tcp
+    state: present
+    enabled: yes

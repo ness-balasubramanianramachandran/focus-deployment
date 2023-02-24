@@ -1,0 +1,91 @@
+---
+# # # Install SQL Developer Edition
+
+# # Load required powershell modules
+  - name: Powershell | Check for SQLServer DSC Powershell module
+    win_psmodule:
+      name: SQLServerDsc
+      state: present
+
+  - name: Powershell | Check for Storage DSC Powershell module
+    win_psmodule:
+      name: StorageDsc
+      state: present
+
+  - name: Powershell | Check for ServerManager Powershell module
+    win_psmodule:
+      name: ServerManager
+      state: present
+
+  - name: Powershell | Ensure that DBA Tools module is present
+    win_psmodule:
+      name: dbatools
+      state: present
+
+  - name: Powershell | Check for xNetworking Powershell module
+    win_psmodule:
+      name: xNetworking
+      state: present
+
+  - name: Windows | Install Windows Process Activation Service
+    win_feature:
+      name: WAS
+      state: present
+      include_sub_features: True
+
+# # SQL install may fail if a pending reboot is detected
+# # Assuming we are allowed to reboot this step will check for pending reboots
+# # and execute a reboot, reboot activity can be controlled using the variable mssql_suppress_reboot
+ 
+  - name: Find mssql server iso
+    win_find:
+      paths: "{{ software_dir }}\\mssql_server"
+
+  - name: Ensure an ISO is mounted
+    win_disk_image:
+      image_path: "{{ software_dir }}\\mssql_server\\{{ mssql_software_name }}"
+      state: present
+    register: disk_image_out
+
+  - name: Run Setup.exe for SQL Server 2019
+    win_shell: (start /w {{disk_image_out.mount_paths[0]}}\SETUP.exe /configurationfile="{{ software_dir }}\\third_party_sw\sql_conf.ini" || IF "%ERRORLEVEL%"=="3010" EXIT 0)
+    args:
+      executable: cmd
+    become: yes
+    become_method: runas
+    vars:
+      ansible_become_user: "{{ ansible_user }}"
+      ansible_become_pass: "{{ ansible_password }}"
+
+  - name: Unmount ISO
+    win_disk_image:
+      image_path: "{{ software_dir }}\\mssql_server\\{{ mssql_software_name }}"
+      state: absent
+
+  - name: Open Firewall port in registry for SQL Server
+    win_regedit:
+      path: HKLM:\Software\Microsoft\Microsoft SQL Server\MSSQL15."{{mssql_instance_name}}"\MSSQLServer\SuperSocketNetLib\Tcp\IPAll
+      name: TcpPort
+      data: 2433
+    register: win_reg
+
+  - name: Restart the service
+    win_service:
+      name: "{{mssql_instance_name}}"
+      force_dependent_services: yes
+      state: restarted
+    when: win_reg.changed
+ 
+  - name: Save the configuration file for SQL Server
+    win_template:
+      src: sql-hardening.sql.j2
+      dest: "{{ software_dir }}\\mssql_server\\sql-hardening.sql"
+
+  - name: Apply SQL Hardenining changes
+    win_shell: Invoke-Sqlcmd –ServerInstance "{{ ansible_facts['fqdn'] }},{{ mssql_port }}" –Username "sa" -Password {{ mssql_password }} -InputFile "{{ software_dir }}\\mssql_server\\sql-hardening.sql"
+  
+  - name: Restart the service
+    win_service:
+      name: "{{mssql_instance_name}}"
+      force_dependent_services: yes
+      state: restarted

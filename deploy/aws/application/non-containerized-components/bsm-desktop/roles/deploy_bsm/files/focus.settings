@@ -1,0 +1,41 @@
+Key = 'File.DBScripts'
+Value = 'C:\Program Files\Ambit Focus 2020.2\FocusDBScripts.ZIP'
+
+Key = 'StatusManager.sqlAuthentication'
+Value = 'False'
+
+Key = 'StatusManager.location'
+Value = 'EMEAZRHCARTDB'
+
+Key = 'StatusManager.name'
+Value = 'FocusDB'
+
+Key = 'trace.database.sqlAuthentication'
+Value = 'False'
+
+Key = 'trace.database.location'
+Value = 'EMEAZRHCARTDB'
+
+Key = 'trace.database.name'
+Value = 'LoggingDB'
+
+Key = 'Calculation.RemoteType'
+Value = '1'
+
+Key = 'RouterAddress'
+Value = 'EMEAZRHCARTCAL1'
+
+Key = 'RouterPort'
+Value = '56060'
+
+Key = 'RemoteCollection'
+Value = 'False'
+
+Key = 'FocusClientPortFrom'
+Value = '5000'
+
+Key = 'FocusClientPortTo'
+Value = '5100'
+
+Key = 'DataHubUrl'
+Value = 'http://EMEAZRHCARTAPP:8080/DataHub/'

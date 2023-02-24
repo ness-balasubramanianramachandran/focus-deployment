@@ -1,0 +1,9 @@
+Calculation.RemoteType={{ bsmi_ce_remote_type }}
+RemoteCollection={{ bsmi_ce_remote_collection }}
+FocusClientPortFrom={{ bsmi_port_from }}
+FocusClientPortTo={{ bsmi_port_to }}
+DataHubUrl="http://{{ ansible_facts['fqdn'] }}:{{ dh_port_number }}/DataHub"
+authentication.ClientSecret={{ bsmi_client_secret }}
+authentication.OidcEnabled={{bsmi_oidc_enabled }}
+authentication.OidcEndpoint="http://{{ ansible_facts['fqdn'] }}:{{ dh_port_number }}/DataHub/Identity"
+authentication.SsoEnabled={{ bsmi_sso_enabled }}

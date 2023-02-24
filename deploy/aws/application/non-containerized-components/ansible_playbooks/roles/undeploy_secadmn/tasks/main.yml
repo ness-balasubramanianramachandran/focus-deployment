@@ -1,0 +1,11 @@
+- name: Find Security Admin msi
+  win_find:
+    paths: "{{ software_dir }}\\bsmi_{{ app_version }}\\Installers"
+    patterns: "Security.AdminTool-*-win32.msi"
+  register: secadmn_msi
+
+- name: Un-Install Security Admin
+  win_package:
+    arguments: "INSTALLFOLDER=\"{{ secadmn_install_dir }}\""
+    state: absent
+    path: "{{ secadmn_msi.files[0].path }}"  

@@ -1,0 +1,32 @@
+- name: Find BSMI msi
+  win_find:
+    paths: "{{ software_dir }}\\bsmi_{{ app_version }}\\Installers"
+    patterns: "FIS.BalanceSheetManager Internal-*-win64.msi"
+  register: focus_msi
+
+- name: Install Focus
+  win_package:
+    arguments: "INSTALLFOLDER=\"{{ bsmi_install_dir }}\""
+    state: present
+    path: "{{ focus_msi.files[0].path }}"
+    log_path: "{{software_dir }}\\bsmi_install_log.txt"
+
+- name: Open Windows Firewall ports for Focus
+  win_firewall_rule:
+    name: FocusAppServer-TCP-In
+    localport: "{{ bsmi_port_range }}"
+    action: allow
+    direction: in
+    protocol: tcp
+    state: present
+    enabled: yes
+
+- name: Copy Focus license
+  win_copy:
+    src: bsmi_license.xml
+    dest: "{{ bsmi_install_dir }}\\license.xml"
+
+- name: Copy BSMI configuration template
+  win_template:
+    src: bsmi_settings.j2
+    dest: "{{ bsmi_install_dir }}\\settings.dat"

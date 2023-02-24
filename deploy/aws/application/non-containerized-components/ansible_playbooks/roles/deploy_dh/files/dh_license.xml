@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<License xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <Vendor>Risk and Performance</Vendor>
+    <Customer>
+        <CustomerName>FNFIS\e5658831</CustomerName>
+    </Customer>
+    <CustomerBound>true</CustomerBound>
+    <MaxConcurrentActivations>0</MaxConcurrentActivations>
+    <ConcurrentUsers>10</ConcurrentUsers>
+    <ProductName>Ambit Data Hub</ProductName>
+    <IssueDate>2022-07-15</IssueDate>
+    <StartDate>2022-07-15</StartDate>
+    <LicenseStoreType>Machine</LicenseStoreType>
+    <LicenseRevision>0</LicenseRevision>
+    <LicenseLevel>Commercial</LicenseLevel>
+    <IsRenewable>false</IsRenewable>
+    <VirtualMachinesAllowed>false</VirtualMachinesAllowed>
+    <NetworkAccessAllowed>false</NetworkAccessAllowed>
+    <Features>
+        <Feature>
+            <Name>Internal</Name>
+            <Limitations ExpirationPeriod="PT0S" GracePeriod="PT0S" WorkingTimeLimit="PT0S">
+                <ExpirationDate>0001-01-01</ExpirationDate>
+            </Limitations>
+        </Feature>
+        <Feature>
+            <Name>Aggregation</Name>
+            <Limitations ExpirationPeriod="PT0S" GracePeriod="PT0S" WorkingTimeLimit="PT0S">
+                <ExpirationDate>0001-01-01</ExpirationDate>
+            </Limitations>
+        </Feature>
+        <Feature>
+            <Name>Transformation</Name>
+            <Limitations ExpirationPeriod="PT0S" GracePeriod="PT0S" WorkingTimeLimit="PT0S">
+                <ExpirationDate>0001-01-01</ExpirationDate>
+            </Limitations>
+        </Feature>
+    </Features>
+    <Limitations ExpirationPeriod="PT0S" GracePeriod="P62D" WorkingTimeLimit="PT0S">
+        <ExpirationDate>2023-07-15</ExpirationDate>
+    </Limitations>
+    <Signature xmlns="http://www.w3.org/2000/09/xmldsig#">
+        <SignedInfo>
+            <CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315" />
+            <SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1" />
+            <Reference URI="">
+                <Transforms>
+                    <Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature" />
+                </Transforms>
+                <DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
+                <DigestValue>lpAjndQW7y1e+HnQTDzHrq+PfrM=</DigestValue>
+            </Reference>
+        </SignedInfo>
+        <SignatureValue>JuLn8IpEOVQupoACUW117EG0LJAOqoPrOe1FyYEdk6xEZgVJlmBu+1TVxPPr2etvmhrWe0jYRxda04DEzKXReHPGUVh6JgBbdBAKtykyKms71YYwH4BLfJFRTE/PdppWUa91l+iHzjzM13TFntwxDwczN/cSJ+v9TVGcuWYVCu8=</SignatureValue>
+    </Signature>
+</License>

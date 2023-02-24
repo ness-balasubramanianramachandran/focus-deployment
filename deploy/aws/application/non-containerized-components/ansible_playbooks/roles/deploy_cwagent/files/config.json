@@ -1,0 +1,85 @@
+{
+	"agent": {
+	  "metrics_collection_interval": 60,
+	  "logfile": "c:\\ProgramData\\Amazon\\AmazonCloudWatchAgent\\Logs\\amazon-cloudwatch-agent.log"
+	},
+	"metrics": {
+		"aggregation_dimensions": [
+			[
+				"InstanceId"
+			]
+		],
+		"append_dimensions": {
+			"AutoScalingGroupName": "${aws:AutoScalingGroupName}",
+			"ImageId": "${aws:ImageId}",
+			"InstanceId": "${aws:InstanceId}",
+			"InstanceType": "${aws:InstanceType}"
+		},
+		"metrics_collected": {
+			"LogicalDisk": {
+				"measurement": [
+					"% Free Space"
+				],
+				"metrics_collection_interval": 60,
+				"resources": [
+					"*"
+				]
+			},
+			"Memory": {
+				"measurement": [
+					"% Committed Bytes In Use"
+				],
+				"metrics_collection_interval": 60,
+				"resources": [
+					"*"
+				]
+			},
+			"Processor": {
+            "measurement": [
+              {"name": "% Idle Time", "rename": "CPU_IDLE", "unit": "Percent"},
+              "% Interrupt Time",
+              "% User Time",
+              "% Processor Time"
+            ],
+            "resources": [
+              "*"
+            ],
+            "append_dimensions": {
+              "customized_dimension_key_1": "customized_dimension_value_1",
+              "customized_dimension_key_2": "customized_dimension_value_2"
+            }
+          },
+			"statsd": {
+				"metrics_aggregation_interval": 60,
+				"metrics_collection_interval": 10,
+				"service_address": ":8125"
+			}
+		}
+	},
+  "logs": {
+	  "logs_collected": {
+		  "files": {
+			  "collect_list": [	
+				  {
+					  "file_path": "C:\\Websites\\DataHub\\DataHub\\ClassicUI\\App_Data\\DataHub.log",
+					  "log_group_name": "/aws/applicationserver/logs/de-appserver-logs",
+					  "log_stream_name": "Datahub_App_logs_{instance_id}",
+					  "retention_in_days": 30
+				  },
+				  {
+					"file_path": "C:\\Websites\\DataHub\\DataHub\\ClassicUI\\App_Data\\DataHubFallback.log",
+					"log_group_name": "/aws/applicationserver/logs/de-appserver-logs",
+					"log_stream_name": "Datahub_App_logs_{instance_id}",
+					"retention_in_days": 30
+				},				  
+				{
+					"file_path": "C:\\Users\\**\\AppData\\Local\\FIS Balance Sheet Manager\\2*\\trace.log",
+					"log_group_name": "/aws/applicationserver/logs/de-appserver-logs",
+					"log_stream_name": "Bsmi_App_logs_{instance_id}",
+					"retention_in_days": 30
+				}				
+			  ]
+		  }
+	  }
+  }
+}

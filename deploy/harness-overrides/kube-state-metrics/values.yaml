@@ -1,0 +1,14 @@
+fullnameOverride: ${service.name}
+
+resources:
+  requests:
+   cpu: 10m
+   memory: 128Mi
+  limits:
+   cpu: 100m
+   memory: 512Mi
+
+dockercfg:
+  value: ${artifact.source.dockerconfig}
+  annotations:
+    harness.io/skip-versioning: "true"

@@ -1,0 +1,132 @@
+fullnameOverride: ${service.name}
+
+dockercfg:
+  value: ${artifact.source.dockerconfig}
+  annotations:
+    harness.io/skip-versioning: "true"
+
+serviceAccount:
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::${serviceVariable.AWS_ACCOUNT_ID}:role/${serviceVariable.EKS_CLUSTER_NAME}-AWS-OTEL-ContainerInsights-Deployment
+
+resources:
+  limits:
+    cpu:  200m
+    memory: 512Mi
+  requests:
+    cpu: 200m
+    memory: 256Mi
+
+clusterName: ${serviceVariable.EKS_CLUSTER_NAME}
+
+config:
+  prometheus-scrape: |
+    receivers:
+      prometheus:
+        config:
+          scrape_configs:
+          - job_name: 'kubernetes-pods'
+            authorization:
+              credentials_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+            tls_config:
+              ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+            kubernetes_sd_configs:
+            - role: pod
+            relabel_configs:
+            - source_labels: [__meta_kubernetes_pod_label_app_kubernetes_io_name]
+              action: keep
+              regex: ^cluster-autoscaler$|^external-dns$|^fluent-bit-linux$|^kube-state-metrics$
+            - action: replace
+              regex: (.+)
+              source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_path]
+              target_label: __metrics_path__
+    processors:
+      batch:
+        timeout: 60s
+      resourcedetection:
+        detectors:
+        - eks
+        - env
+      filter:
+        metrics:
+          include:
+            match_type: regexp
+            metric_names:
+            - ^cluster_autoscaler_cluster_safe_to_autoscale$
+            - ^cluster_autoscaler_errors_total$
+            - ^cluster_autoscaler_failed_scale_ups_total$
+            - ^cluster_autoscaler_unneeded_nodes_count$
+            - ^external_dns_registry_errors_total$
+            - ^external_dns_source_errors_total$
+            - ^fluentbit_output_errors_total$
+            - ^fluentbit_output_retries_failed_total$
+            - ^kube_daemonset_status_current_number_scheduled$
+            - ^kube_daemonset_status_desired_number_scheduled$
+            - ^kube_daemonset_status_number_available$
+            - ^kube_daemonset_status_number_unavailable$
+            - ^kube_deployment_spec_replicas$
+            - ^kube_deployment_status_replicas$
+            - ^kube_deployment_status_replicas_available$
+            - ^kube_deployment_status_replicas_unavailable$
+            - ^kube_namespace_status_phase$
+      metricstransform:
+        transforms:
+        - include: ^kube_(daemonset|deployment|namespace)_.*$
+          match_type: regexp
+          action: update
+          operations:
+          - action: update_label
+            label: namespace
+            new_label: Namespace
+        - include: ^kube_deployment_.*$
+          match_type: regexp
+          action: update
+          operations:
+          - action: update_label
+            label: deployment
+            new_label: Deployment
+        - include: ^kube_daemonset_.*$
+          match_type: regexp
+          action: update
+          operations:
+          - action: update_label
+            label: daemonset
+            new_label: DaemonSet
+        - include: ^kube_namespace_status_phase$
+          match_type: regexp
+          action: update
+          operations:
+          - action: update_label
+            label: phase
+            new_label: Phase
+    exporters:
+      awsemf:
+        namespace: EKS/Prometheus
+        log_group_name: "/aws/containerinsights/{ClusterName}/prometheus"
+        dimension_rollup_option: NoDimensionRollup
+        resource_to_telemetry_conversion:
+          enabled: true
+        metric_declarations:
+        - dimensions: [ [ClusterName] ]
+          metric_name_selectors:
+          - ^cluster_autoscaler_.*$
+          - ^external_dns_.*$
+          - ^fluentbit_output_.*$
+        - dimensions: [ [ClusterName, Namespace, Deployment] ]
+          metric_name_selectors:
+          - ^kube_deployment_.*$
+        - dimensions: [ [ClusterName, Namespace, DaemonSet] ]
+          metric_name_selectors:
+          - ^kube_daemonset_.*$
+        - dimensions: [ [ClusterName, Namespace, Phase] ]
+          metric_name_selectors:
+          - ^kube_namespace_status_phase$
+    extensions:
+      health_check:
+    service:
+      pipelines:
+        metrics:
+          receivers: [prometheus]
+          processors: [filter, resourcedetection, metricstransform, batch]
+          exporters: [awsemf]
+      extensions: [health_check]

@@ -1,0 +1,12 @@
+- name: Find Regulatory Reporting msi
+  win_find:
+    paths: "{{ software_dir }}\\bsmi_{{ app_version }}\\Installers"
+    patterns: "FIS Regulatory Reporting *.msi"
+  register: regrpt_msi
+
+- name: Install Regulatory Reporting
+  win_package:
+    arguments: "INSTALLFOLDER=\"{{ regrpt_install_dir }}\""
+    state: present
+    path: "{{ regrpt_msi.files[0].path }}"
+    log_path: C:\software\log.txt

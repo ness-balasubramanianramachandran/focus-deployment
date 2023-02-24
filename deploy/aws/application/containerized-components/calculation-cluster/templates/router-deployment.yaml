@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: {{ .Release.Name }}
+  name: router
+  labels:
+    app.kubernetes.io/name: router
+    app.kubernetes.io/instance: router
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: router
+      app.kubernetes.io/instance: router
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: router
+        app.kubernetes.io/instance: router
+    spec:
+      containers:
+        - name: router
+          command:
+            - /bin/bash
+            - -c
+            - /home/edit_config.sh "$AkkaHostName" "router.{{ .Release.Name }}.svc.cluster.local" && cd /opt/calcEngine && ./CalculationEngineService -debug -port {{ .Values.router.engine_port }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.router.engine_port }} 
+          env:
+           - name: AkkaHostName
+             valueFrom:
+               fieldRef:
+                 fieldPath: status.podIP
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      nodeSelector:
+        kubernetes.io/os: linux

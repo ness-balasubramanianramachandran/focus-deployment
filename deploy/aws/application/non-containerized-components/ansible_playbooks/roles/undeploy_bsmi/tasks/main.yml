@@ -1,0 +1,31 @@
+- name: Find BSMI msi
+  win_find:
+    paths: "{{ software_dir }}\\bsmi_{{ app_version }}\\Installers"
+    patterns: "FIS.BalanceSheetManager Internal-*-win64.msi"
+  register: focus_msi
+
+- name: Un-Install Focus
+  win_package:
+    arguments: "INSTALLFOLDER=\"{{ bsmi_install_dir }}\""
+    state: absent
+    path: "{{ focus_msi.files[0].path }}"
+
+- name: Close Windows Firewall ports for Focus
+  win_firewall_rule:
+    name: FocusAppServer-TCP-In
+    localport: "{{ bsmi_port_range }}"
+    action: allow
+    direction: in
+    protocol: tcp
+    state: absent
+    enabled: yes
+
+- name: Delete Focus license
+  win_file:
+    path: "{{ bsmi_install_dir }}\\license.xml"
+    state: absent
+
+- name: Delete BSMI configuration template
+  win_file:
+    path: "{{ bsmi_install_dir }}\\settings.dat"
+    state: absent    

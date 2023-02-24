@@ -1,0 +1,4 @@
+---
+example_grp_var: "value of example_grp_var"
+example_grp_pass: "{{ vault_example_grp_pass }}"
+...

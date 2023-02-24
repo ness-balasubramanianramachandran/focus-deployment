@@ -1,0 +1,82 @@
+- name: Delete software directory if it exists
+  win_file:
+    path: "{{ software_dir }}"
+    state: absent
+
+- name: Create 3rd party software directory
+  win_file:
+    path: "{{ software_dir }}\\third_party_sw"
+    state: directory
+
+- name: Create BSMI installers software directory
+  win_file:
+    path: "{{ software_dir }}\\bsmi_{{ app_version }}"
+    state: directory
+
+- name: Download installers' archive from Artifactory
+  win_get_url:
+    url: "{{ af_generic_repo_url }}/installers/{{ installers_archive_name }}"
+    url_username: "{{ af_username }}"
+    url_password: "{{ af_password }}"
+    dest: "{{ software_dir }}\\bsmi_{{ app_version }}\\{{ installers_archive_name }}"
+
+- name: Unzip installers' archive
+  win_unzip:
+    src: "{{ software_dir }}\\bsmi_{{ app_version }}\\{{ installers_archive_name }}"
+    dest: "{{ software_dir }}\\bsmi_{{ app_version }}"
+    delete_archive: yes
+
+- name: Download 3rd party sw msi from Artifactory
+  win_get_url:
+    url: "{{ af_generic_repo_url }}/3rd_party/{{ item.file_name }}"
+    url_username: "{{ af_username }}"
+    url_password: "{{ af_password }}"
+    dest: "{{ software_dir }}\\third_party_sw"
+  loop: "{{ third_party_sw }}"
+
+- name: Download 3rd party sw exe from Artifactory
+  win_get_url:
+    url: "{{ af_generic_repo_url }}/3rd_party/{{ item.file_name }}"
+    url_username: "{{ af_username }}"
+    url_password: "{{ af_password }}"
+    dest: "{{ software_dir }}\\third_party_sw"
+  loop: "{{ third_party_sw_exe }}"
+
+- name: Enable Windows features
+  win_feature:
+    name: "{{ windows_features }}"
+    state: present
+  register: win_features
+
+- name: Reboot the machine
+  win_reboot:
+  when: win_features.changed
+
+- name: Install 3rd party sw msi packages
+  win_package:
+    state: present
+    path: "{{ software_dir }}\\third_party_sw\\{{ item.file_name }}"
+    arguments: "{{ item.arguments }}"
+    log_path: "{{ software_dir }}\\third_party_sw\\log.txt"
+  loop: "{{ third_party_sw }}"
+
+- name: Install 3rd party sw exe packages
+  win_package:
+    state: present
+    product_id: "{{ item.product_id }}"
+    path: "{{ software_dir }}\\third_party_sw\\{{ item.file_name }}"
+    arguments: "{{ item.arguments }}"
+  loop: "{{ third_party_sw_exe }}"
+
+- name: Gather facts from db servers
+  ansible.builtin.setup:
+  delegate_to: "{{ line_item }}"
+  delegate_facts: true
+  loop: "{{ groups['sqlserver'] }}"
+  loop_control:
+    loop_var: line_item
+  register: db_server_facts
+
+- name: task to get db server fqdn from db server's ansible facts
+  debug: 
+    msg: " {{ db_server_facts.results[0].ansible_facts.ansible_fqdn }} "

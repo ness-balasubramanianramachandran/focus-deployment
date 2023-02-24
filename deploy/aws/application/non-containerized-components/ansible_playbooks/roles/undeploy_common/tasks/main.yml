@@ -1,0 +1,32 @@
+- name: Un-Install 3rd party sw packages msi
+  win_package:
+    state: absent
+    path: "{{ software_dir }}\\third_party_sw\\{{ item.file_name }}"
+    arguments: "{{ item.arguments }}"
+  loop: "{{ third_party_sw }}"
+
+- name: Un-Install 3rd party sw packages exe
+  win_package:
+    state: absent
+    product_id: "{{ item.product_id }}"
+    path: "{{ software_dir }}\\third_party_sw\\{{ item.file_name }}"
+    arguments: "{{ item.arguments }}"
+  loop: "{{ third_party_sw_exe }}"
+
+- name: Delete 3rd party software directory
+  win_file:
+    path: "{{ software_dir }}\\third_party_sw"
+    state: absent
+
+- name: Delete BSMI installers software directory
+  win_file:
+    path: "{{ software_dir }}\\bsmi_{{ app_version }}"
+    state: absent
+
+- name: Delete software directory
+  win_file:
+    path: "{{ software_dir }}"
+    state: absent
+
+- name: Reboot the machine
+  win_reboot:

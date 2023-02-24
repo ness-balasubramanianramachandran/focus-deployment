@@ -1,0 +1,3 @@
+---
+- hosts: bastion 
+  role: deploy_bsm_harness

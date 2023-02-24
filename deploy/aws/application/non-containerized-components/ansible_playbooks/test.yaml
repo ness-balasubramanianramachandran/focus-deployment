@@ -1,0 +1,11 @@
+---
+- name: This is a hello-world example
+  hosts: sqlserver
+  tasks:
+    - name: Touch a file (creates if not present, updates modification time if present)
+      win_file:
+        path: C:\foo.conf
+        state: touch
+    - name: Print all available facts
+      ansible.builtin.debug:
+        var: ansible_facts

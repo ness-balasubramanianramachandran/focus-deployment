@@ -1,0 +1,5 @@
+---
+- hosts: bsmi_dh
+  roles:
+    - { role: deploy_msoffice, when: operation  == 'deploy' }    
+    - { role: deploy_msoffice, when: operation  == 'undeploy' }  

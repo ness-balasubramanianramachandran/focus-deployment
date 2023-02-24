@@ -1,0 +1,22 @@
+sp_configure 'Ad Hoc Distributed Queries', 0;
+GO
+sp_configure 'clr enabled' , 1;
+GO
+sp_configure 'cross db ownership chaining', 0;
+GO
+sp_configure 'Database Mail XPs', 0;
+GO
+sp_configure 'Ole Automation Procedures', 0;
+GO  
+sp_configure 'remote access', 0;
+GO  
+sp_configure 'remote admin connections', 0;
+GO
+sp_configure 'scan for startup procs', 0 ;
+GO  
+RECONFIGURE
+GO
+ALTER DATABASE msdb SET TRUSTWORTHY ON;
+GO
+ALTER LOGIN [sa]
+WITH NAME = [{{ mssql_username }}];

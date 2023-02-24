@@ -1,0 +1,8 @@
+---
+- hosts: bsmi_dh
+  roles:
+    - { role: deploy_cwagent, when: operation  == 'deploy' }
+
+- hosts: sqlserver
+  roles:
+    - { role: deploy_cwagentsqlserver, when: operation  == 'deploy' }

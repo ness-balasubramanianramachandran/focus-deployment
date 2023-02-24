@@ -1,0 +1,168 @@
+app_version: __BSMI_VERSION__
+tenant_id: __TENANT_ID__
+
+### Balance Sheet Manager
+bsmi_install_dir: "C:\\Program Files\\Balance Sheet Manager"
+bsmi_ce_remote_type: "2" #new version
+bsmi_ce_router_port: "5606"
+bsmi_ce_remote_collection: "False"
+bsmi_port_from: "5000"
+bsmi_port_to: "5100"
+bsmi_port_range: "{{ bsmi_port_from }}-{{ bsmi_port_to }}"
+bsmi_oidc_enabled: "true"
+bsmi_client_secret: __BSMI_CLIENT_SECRET__
+
+### DATAHUB
+dh_install_dir: "C:\\Program Files\\Ambit DataHub"
+dh_db_name: "dh{{ tenant_id }}"
+dh_pool_name: "DataHub"
+dh_site_name: "DataHub"
+dh_app_name: "DataHub"
+dh_web_dir: "C:\\Websites"
+dh_port_number: 8080
+dh_oidc_token: __DH_OIDC_TOKEN__
+
+### Regulatory Reporting
+regrpt_install_dir: "C:\\Program Files\\FIS Regulatory Reporting"
+
+### Security Admin
+secadmn_install_dir: "C:\\Program Files (x86)\\Ambit Security Admin Tool"
+
+### Risk Reporting - IIS
+iisriskrpt_install_dir: "C:\\Program Files (x86)\\FIS\\RiskReportingWebIisBootstrap"
+
+### FIS Risk Reporting - SQL Administration
+sqlriskrpt_install_dir: "C:\\Program Files (x86)\\XLCubed Ltd\\XLCubed Repository Administration"
+
+### FIS Risk Reporting - Excel Edition
+excelriskrpt_install_dir: "C:\\Program Files (x86)\\FIS Risk Reporting\\Excel Edition"
+
+### FIS Risk Reporting - Web Edition
+webriskrpt_install_dir: "C:\\Inetpub\\wwwroot\\FISRiskReportingWeb"
+
+### FIS Cloudwatch Agent 
+cloudwatch_agent_install_dir: "C:\\Program Files\\Amazon\\AmazonCloudWatchAgent"
+
+### FIS Cloudwatch Agent Config File 
+cloudwatch_agent_config_dir: "C:\\ProgramData\\Amazon\\AmazonCloudWatchAgent"
+
+### AWS RDS SQL
+rds_sql_endpoint: __RDS_ENDPOINT__
+rds_sql_port: __RDS_PORT__
+rds_sql_username: __RDS_USER__
+rds_sql_password: __RDS_PASSWD__
+rds_sql_encrypted_password: __RDS_ENCRYPTED_PASSWD__
+
+### MSSQL DB
+mssql_endpoint: "{{ db_server_facts.results[0].ansible_facts.ansible_fqdn }}"
+#mssql_port: __MSSQL_PORT__
+mssql_port: 2433
+#sql admin user
+mssql_username: __MSSQL_USER__
+mssql_password: __MSSQL_PASSWD__
+mssql_encrypted_password: __MSSQL_ENCRYPTED_PASSWD__
+
+
+### SQL server
+sa_user_password: __MSSQL_PASSWD__
+
+# PREREQUISITES
+
+software_dir: "C:\\software"
+
+third_party_sw:
+  - name: "Microsoft Web Deploy 3.6"
+    file_name: "WebDeploy_amd64_en-US.msi"
+    arguments: '/norestart ADDLOCAL=ALL LicenseAccepted="0" '
+  - name: "Microsoft .NET Core Runtime - 3.1.3 (x64)"
+    file_name: "dotnet-runtime-3.1.3-win-x64.msi"
+    arguments: "/q /norestart "
+  - name: "Microsoft .NET Core Host - 3.1.3 (x64)"
+    file_name: "dotnet-host-3.1.3-win-x64.msi"
+    arguments: '/q /norestart LicenseAccepted="0" '
+  - name: "Microsoft .NET Core Host FX Resolver - 3.1.3 (x64)"
+    file_name: "dotnet-hostfxr-3.1.3-win-x64.msi"
+    arguments: "/q /norestart "
+  - name: "Microsoft ASP.NET Core 3.1.3 Shared Framework (x64)"
+    file_name: "AspNetCoreSharedFramework-x64.msi"
+    arguments: "/q /norestart "
+  - name: "Microsoft ASP.NET Core Module V2"
+    file_name: "aspnetcoremodule_x64_en_v2.msi"
+    arguments: "/q /norestart "
+  - name: "IIS URL Rewrite 2"
+    file_name: "rewrite_amd64_en-US.msi"
+    arguments: '/q /norestart'
+  - name: "SQL Server 2016 Analysis Services OLEDB Provider"
+    file_name: "SQLSERVER2016_ASOLEDB13SP2_x64.msi"
+    arguments: '/q /norestart'
+  - name: "SQL Server 2012 Analysis Services ADOMD.NET Provider"
+    file_name: "SQLSERVER2012_ASADOMD11_x64.msi"
+    arguments: '/q /norestart'
+  - name: "SQL Server 2016 Analysis Services ADOMD.NET Provider"
+    file_name: "SQLSERVER2016_ASADOMD13SP2_x64.msi"
+    arguments: '/q /norestart'              
+  - name: "SQL Server 2016 SQLSysClrType"
+    file_name: "SQLSERVER2016_SQLSysClrTypes_x64.msi"
+    arguments: '/q /norestart'
+  - name: "SQL Server 2016 Shared Management Objects"
+    file_name: "SQLSERVER2016_SharedManagementObjects_x64.msi"
+    arguments: '/q /norestart'
+  
+third_party_sw_exe:
+  - name: "Dotnet 6"
+    file_name: "windowsdesktop-runtime-6.0.8-win-x64.exe"
+    product_id: "18A31B3F7FED28870B882909D91DFA8EC5BC87A6"
+    arguments: '/q /norestart'
+  - name: "Microsoft Access Database Engine"
+    file_name: "AccessDatabaseEngine_2010_x64.exe"
+    product_id: "18A31B3F7FED28870B882909D91DFA8EC5BC87A6"
+    arguments: '/q /norestart'    
+
+windows_features:
+  - NET-Framework-45-Core
+  - Web-Default-Doc
+  - Web-Dir-Browsing
+  - Web-Http-Errors
+  - Web-Static-Content
+  - Web-Http-Redirect
+  - Web-Http-Logging
+  - Web-Log-Libraries
+  - Web-Request-Monitor
+  - Web-Http-Tracing
+  - Web-Stat-Compression
+  - Web-Filtering
+  - Web-Basic-Auth
+  - Web-Windows-Auth
+  - Web-Net-Ext45
+  - Web-Asp-Net45
+  - Web-ISAPI-Ext
+  - Web-ISAPI-Filter
+  - Web-Mgmt-Console
+  - Web-Mgmt-Service
+  - MSMQ-Server
+  - MSMQ-Directory
+  - MSMQ-HTTP-Support
+
+### ANSIBLE
+ansible_user: ansible
+ansible_password: __ANSIBLE_PASSWD__
+ansible_connection: winrm
+ansible_winrm_server_cert_validation: ignore
+ansible_port: 5986
+ansible_winrm_operation_timeout_sec: 120
+ansible_winrm_read_timeout_sec: 140
+ansible_winrm_transport: ntlm
+
+### ARTIFACTORY
+af_username: "SvcAcct_ARPartifact"
+af_password: __ARTIFACTORY_PASSWD__
+af_generic_repo_url: __AF_GENERIC_REPO_URL__
+installers_archive_name: "Installers-{{ app_version }}.zip"
+msoffice_software_name: "en_office_professional_plus_2021_x86_x64_dvd_c6dd6dc6.iso"
+
+# # MSSQL configuration details
+mssql_instance_name: MSSQLSERVER
+mssql_software_name: "en_sql_server_2019_standard_x64_dvd_814b57aa.iso"
+cloud_watch_agent_name: "amazon-cloudwatch-agent.msi"
+start_cloud_watch_agent_name: "start-amazon-cloudwatch-agent.exe"
+

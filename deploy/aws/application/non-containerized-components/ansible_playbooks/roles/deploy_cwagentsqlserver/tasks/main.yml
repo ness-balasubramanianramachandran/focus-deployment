@@ -1,0 +1,28 @@
+
+- name: Download Cloudwatch Agent msi from Artifactory
+  win_get_url:
+    url: "{{ af_generic_repo_url }}/3rd_party/{{ cloud_watch_agent_name }}"
+    url_username: "{{ af_username }}"
+    url_password: "{{ af_password }}"
+    dest: "{{ software_dir }}\\third_party_sw"
+
+- name: Find Cloudwatch Agent msi
+  win_find:
+    paths: "{{ software_dir }}\\third_party_sw"
+    patterns: "amazon-cloudwatch-agent.msi"
+  register: cloudwatch_msi
+
+- name: Install Cloudwatch Agent msi
+  win_package:
+    arguments: "INSTALLFOLDER=\"{{ cloudwatch_agent_install_dir }}\""
+    state: present
+    path: "{{ cloudwatch_msi.files[0].path }}"
+    log_path: C:\software\CloudwatchAgent_Logs.txt
+
+- name: Save the configuration file for cloudwatch agent
+  win_copy:
+    src: config.json
+    dest: "{{ cloudwatch_agent_config_dir }}\\amazon-cloudwatch-agent.json"
+
+- name: Run cloudwatch agent
+  win_shell: '& "{{ cloudwatch_agent_install_dir }}\amazon-cloudwatch-agent-ctl.ps1" -a fetch-config -m ec2 -s -c file:"{{ cloudwatch_agent_config_dir }}\amazon-cloudwatch-agent.json" '  

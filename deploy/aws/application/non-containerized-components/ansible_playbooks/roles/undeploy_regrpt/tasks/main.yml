@@ -1,0 +1,11 @@
+- name: Find Regulatory Reporting msi
+  win_find:
+    paths: "{{ software_dir }}\\bsmi_{{ app_version }}\\Installers"
+    patterns: "FIS Regulatory Reporting*.msi" #TODO update right pattern for Reg reporting
+  register: regrpt_msi
+
+- name: Un-Install Regulatory Reporting
+  win_package:
+    arguments: "INSTALLFOLDER=\"{{ regrpt_install_dir }}\""
+    state: absent
+    path: "{{ regrpt_msi.files[0].path }}"

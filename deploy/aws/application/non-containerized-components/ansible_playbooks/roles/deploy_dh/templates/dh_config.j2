@@ -1,0 +1,41 @@
+{
+  "DataHub": true,
+  "ActivityService": false,
+  "ConnectionStrings": [
+    {
+      "Name": "DataHubDb",
+      "Server": "{{ mssql_endpoint }}",
+      "Port": {{ mssql_port }},
+      "Database": "{{ dh_db_name }}",
+      "DbKind": 1,
+      "CredentialsSpecified": true,
+      "UserName": "{{ mssql_username }}",
+      "Password": "{{ mssql_encrypted_password }}"
+    }
+  ],
+  "IisConfiguration": {
+    "ApplicationPoolName": "{{ dh_pool_name }}",
+    "SiteName": "{{ dh_site_name }}",
+    "ApplicationName": "{{ dh_app_name }}",
+    "OverrideExisting": true,
+    "FilesLocation": "{{ dh_web_dir | regex_replace('\\\\', '\\\\;') | regex_replace(';', '\\\\')}}",
+    "Port": {{ dh_port_number }},
+    "UseFullyQualifiedDomainName": true,
+    "UseAppPoolIdentity": true,
+    "CustomIdentityUserName": "",
+    "CustomIdentityPassword": ""
+  },
+  "LicenceConfiguration": {
+    "LicenceLocation": "{{ dh_web_dir | regex_replace('\\\\', '\\\\;') | regex_replace(';', '\\\\')}}\\license.xml"
+  },
+  "PluginsConfiguration": {
+    "PluginsLocations": [
+      "{{ dh_web_dir | regex_replace('\\\\', '\\\\;') | regex_replace(';', '\\\\')}}\\Plugins\\Focus Instrument Plug-In\\Balance Sheet Manager"
+    ]
+  },
+  "ActivityServiceConfigurations": [],
+  "AuthenticationConfiguration": {
+    "UseOidcAuthentication": true,
+    "ClientSecret": "{{ dh_oidc_token }}"
+  }
+}

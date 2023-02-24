@@ -1,0 +1,57 @@
+---
+- hosts: bsmi_dh
+  roles:
+    - { role: deploy_common, when: operation  == 'deploy' }
+    - { role: deploy_bsmi, when: operation  == 'deploy' }
+    - { role: deploy_dh, when: operation  == 'deploy' }
+    - { role: deploy_regrpt, when: operation  == 'deploy' }
+    - { role: deploy_secadmn, when: operation  == 'deploy' }
+    - { role: deploy_riskrpt, when: operation  == 'deploy' }       
+    - { role: undeploy_bsmi, when: operation  == 'undeploy' }
+    - { role: undeploy_dh, when: operation  == 'undeploy' }
+    - { role: undeploy_regrpt, when: operation  == 'undeploy' }
+    - { role: undeploy_secadmn, when: operation  == 'undeploy' }
+    # - { role: undeploy_riskrpt, when: operation  == 'undeploy' }
+    - { role: undeploy_common, when: operation  == 'undeploy' }             
+
+- hosts: bsmi
+  roles:
+    - { role: deploy_common, when: operation  == 'deploy' }
+    - { role: deploy_bsmi, when: operation  == 'deploy' }
+    - { role: undeploy_bsmi, when: operation  == 'undeploy' }
+    - { role: undeploy_common, when: operation  == 'undeploy' }
+
+- hosts: dh
+  roles:
+    - { role: deploy_common, when: operation  == 'deploy' }
+    - { role: deploy_dh, when: operation  == 'deploy' }
+    - { role: undeploy_dh, when: operation  == 'undeploy' }
+    - { role: undeploy_common, when: operation  == 'undeploy' }
+
+- hosts: regrpt
+  roles:
+    - { role: deploy_common, when: operation  == 'deploy' }
+    - { role: deploy_regrpt, when: operation  == 'deploy' }
+    - { role: undeploy_regrpt, when: operation  == 'undeploy' }
+    - { role: undeploy_common, when: operation  == 'undeploy' }
+
+- hosts: secadmn
+  roles:
+    - { role: deploy_common, when: operation  == 'deploy' }
+    - { role: deploy_secadmn, when: operation  == 'deploy' }
+    - { role: undeploy_common, when: operation  == 'undeploy' }
+    - { role: undeploy_secadmn, when: operation  == 'undeploy' }
+
+- hosts: riskrpt
+  roles:
+
+    - { role: deploy_common, when: operation  == 'deploy' }
+    - { role: deploy_riskrpt, when: operation  == 'deploy' }
+    - { role: undeploy_common, when: operation  == 'undeploy' } 
+    - { role: undeploy_riskrpt, when: operation  == 'undeploy' }
+
+- hosts: sqlserver ##This should not be removed as this service is deployed in separate EC2 MSSQL server
+  roles:
+    - { role: deploy_sqlcommon, when: operation  == 'deploy' }
+    - { role: deploy_sqlserver, when: operation  == 'deploy' }  
+    #- { role: undeploy_sqlserver, when: operation  == 'undeploy' }    
